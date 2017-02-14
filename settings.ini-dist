@@ -1,0 +1,11 @@
+[server]
+host =
+username =
+password =
+dbname =
+
+[test]
+partner_name =
+
+[webservice]
+port = 
