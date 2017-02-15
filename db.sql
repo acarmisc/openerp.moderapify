@@ -1,0 +1,1 @@
+CREATE TABLE api_sessions ( ID INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT, username VARCHAR(200), password VARCHAR(200) );
