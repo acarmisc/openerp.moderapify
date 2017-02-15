@@ -1,23 +1,18 @@
 import xmlrpclib
 
-user = 'admin'
-pwd = 'admin'
-dbname = 'terp3'
-model = 'res.partner'
 
 class OpenErp:
 
-    def __init__(self, config_object=None, host=None, dbname=None, user='admin', password='admin'):
+    def __init__(self, config_object=None, host=None, dbname=None, user=None, password=None, token=None):
         if config_object:
             self.host = config_object.host
             self.dbname = config_object.dbname
-            self.user = config_object.username
-            self.password = config_object.password
         else:
             self.host = host
             self.dbname = dbname
-            self.user = user
-            self.password = password
+
+        self.user = user
+        self.password = password
 
         sock = xmlrpclib.ServerProxy('%s/xmlrpc/common' % self.host)
 
@@ -46,7 +41,7 @@ class OpenErp:
             raise ValueError('Find args must be a list of tuple.')
 
         ids = self.sock.execute(self.dbname, self.uid, self.password, model, 'search', args)
-        results = self.sock.execute(self.dbname, self.uid, self.password, model, 'read', ids, fields)        
+        results = self.sock.execute(self.dbname, self.uid, self.password, model, 'read', ids, fields)
         return results
 
     def delete(self, model, ids):
