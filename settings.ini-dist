@@ -3,10 +3,13 @@ host =
 username =
 password =
 dbname =
-localdb = session.db
+localdb = :memory:
 
 [test]
-partner_name =
+partner_name = aa
+localdb = :memory:
+username = foo
+password = bar
 
 [webservice]
 port = 8080

@@ -9,6 +9,7 @@ from erp_xmlrpc import OpenErp
 
 log = Logger()
 db = LocalDatabase(config.server.localdb)
+db.init_db()
 
 @route('/')
 def home(request):

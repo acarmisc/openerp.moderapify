@@ -16,7 +16,7 @@ Simply clone the repo and setup your virtual environment ::
     $ source venv/bin/activate
     $ pip install -r requirements.txt
 
-To create local database for credentials ::
+If you want to store credentials locally you can set a db name in ``settings.ini``. To create basic schema run ::
 
     $ sqlite sessions.db < db.sql
 

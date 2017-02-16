@@ -10,6 +10,7 @@ class ServerTest(unittest.TestCase):
         self.config = Confiky(files='settings.ini', required_sections=['webservice', 'server', 'test'])
         self.erp = OpenErp(config_object=self.config.server, user=self.config.test.username, password=self.config.test.password)
         self.db = LocalDatabase(self.config.test.localdb)
+        self.db.init_db()
         self.token = '1234'
 
     def test_find(self):
@@ -29,10 +30,6 @@ class ServerTest(unittest.TestCase):
         response = response.json()
 
         self.assertEqual(status, 401)
-
-    def test_create_db(self):
-        res = self.db.init_db()
-        self.assertTrue(res)
 
     def test_get_all_credentials(self):
         res = self.db.get_all_credentials()
