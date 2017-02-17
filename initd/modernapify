@@ -1,12 +1,12 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          uamaaaserver
+# Provides:          modernapify
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: CoovaChilli UAM AAA HTTP Server
-# Description:       CoovaChilli UAM AAA HTTP Server
+# Short-Description: modernapify
+# Description:       modernapify
 ### END INIT INFO
 
 # Author: Marco Lertora <marco.lertora@infoporto.it>
