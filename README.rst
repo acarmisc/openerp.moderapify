@@ -59,7 +59,7 @@ Pass ``model`` in dot notation (like ``res.partner``) and the id of item to be r
 
 Call ``api/<model>`` passing ``query`` as semicolon separated list of criteria that Openerp love (ie: field, criteria, value).
 
-    GET /api/<model>/?query=name,like,foo;active,=,true&fields=id,name,bar
+    GET /api/<model>/?query=name,like,foo:active,=,true&fields=id,name,bar
 
 **Create item**
 

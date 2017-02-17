@@ -4,6 +4,7 @@ from twisted.enterprise import adbapi
 import sqlite3
 from confiky import Confiky
 import uuid
+from functools import wraps
 
 
 config = Confiky(files='settings.ini')
@@ -63,17 +64,18 @@ class Security:
         return "<Security %s>" % self.token
 
     def _extract_token(self):
+        
         headers = self.request.getAllHeaders()
         if 'authorization' in headers.keys():
             token = headers.get('authorization').split(' ')
             if token[0] != 'Token':
-                request, response = Responder(request).error_data('Wrong authentication header format.')
-                return response
+                raise ValueError('Wrong authentication header format.')
+
             token = token[1]
             return token
 
         else:
-            request, response = Responder(request).error_data('Missing authentication header.')
+            request, response = Responder(self.request).error_data('Missing authentication header.')
 
         return None
 
@@ -90,9 +92,12 @@ class Security:
         return db.get_credentials_by_token(self.token)
 
 def credential_cached(original_function):
+    @wraps(original_function)
     def validate_user(*args, **kwargs):
         request = args[0]
         security = Security(request=request)
+
+        print security
 
         if security.is_authenticated():
             credentials = security.credentials()
@@ -112,19 +117,29 @@ class RequestParser:
     def parse_query(query):
         criteria = list()
         if not query:
-            return None
+            return []
 
-        if ';' in query:
-            queries = query.split(';')
+        query = query[0]
+        print query
+        if ':' in query:
+            queries = query.split(':')
         else:
             queries = [query]
+        print queries
 
         for q in queries:
-            criteria.append(tuple(q.slit(',')))
+            criteria.append(tuple(q.split(',')))
+
+        print criteria
+        return criteria
 
     @staticmethod
-    def parse_fields(query):
-        raise NotImplemented
+    def parse_fields(fields):
+        if not fields:
+            return []
+
+        fields = fields[0]
+        return fields.split(',')
 
 class Responder:
 
@@ -161,5 +176,10 @@ class Responder:
 
     def error_data(self, message=None):
         self.status = 400
+        self.message = message
+        return self.build()
+
+    def created(self, message=None):
+        self.status = 201
         self.message = message
         return self.build()

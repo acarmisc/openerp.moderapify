@@ -9,7 +9,7 @@ from erp_xmlrpc import OpenErp
 
 log = Logger()
 db = LocalDatabase(config.server.localdb)
-db.init_db()
+#db.init_db()
 
 @route('/')
 def home(request):
@@ -23,20 +23,21 @@ def test_unauth(request):
     request, response = Responder(request).unauthorize()
     return response
 
-@route('/api/logout/')
+@route('/logout/')
 def logout(request):
     token = Security(request=request).token
     db.clear_session(token)
 
     request, response = Responder(request, message='Session closed.', payload=dict(token=token)).build()
 
-@route('/api/login/', methods=['POST'])
+@route('/login/', methods=['POST'])
 def login(request):
     if ('username', 'password') not in request.args:
         Responder(request).error_data('Missing arguments')
 
     username = request.args.get('username')[0]
     password = request.args.get('password')[0]
+
     erp = OpenErp(config_object=config.server, user=username, password=password)
     if erp.uid:
         token = Security().token
@@ -48,32 +49,29 @@ def login(request):
 
     return response
 
-@route('/api/models/<model>/<id>/', methods=['GET'])
+
+@route('/models/<model>/', methods=['GET'])
 @credential_cached
-def find_by_id(request, model, id):
+def model(request, model):
+    parser = RequestParser()
+    query = parser.parse_query(request.args.get('query'))
+    fields = parser.parse_fields(request.args.get('fields'))
     erp = OpenErp(config_object=config.server, user=username, password=password)
-    args = [('id', '=', id)]
-    fields = request.args.get('fields')
-    if fields:
-        fields = fields[0].split(',')
-    results = erp.find(model, args, fields=fields)
-    log.debug('Received GET request for model %s with fields %s' % (model, fields))
+    results = erp.find(model, query, fields=fields)
 
     request, response = Responder(request, payload=results).build()
 
     return response
 
-@route('/api/<model>/', methods=['GET'])
-def find(request, model):
-    erp = OpenErp(config.server)
-    parser = RequestParser()
-    query = parser.parse_query(request.args.get('query')[0])
-    fields = parser.parse_fields(request.args.get('fields')[0])
-    args = list()
-    for el in query:
-        args.append(tuple(el.split(',')))
 
+@route('/models/<model>/<id>/', methods=['GET'])
+@credential_cached
+def model_get(request, model, id):
+    args = [('id', '=', id)]
+    fields = RequestParser().parse_fields(request.args.get('fields'))
+    erp = OpenErp(config_object=config.server, user=username, password=password)
     results = erp.find(model, args, fields=fields)
+    log.debug('Received GET request for model %s with fields %s' % (model, fields))
 
     request, response = Responder(request, payload=results).build()
 
