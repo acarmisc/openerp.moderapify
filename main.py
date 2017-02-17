@@ -1,4 +1,4 @@
-from klein import run, route
+from klein import run, route, resource
 from helpers import Responder, RequestParser, LocalDatabase, Security, config, credential_cached
 import json
 import uuid

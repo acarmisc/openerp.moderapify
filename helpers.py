@@ -7,7 +7,7 @@ import uuid
 from functools import wraps
 
 
-config = Confiky(files='settings.ini')
+config = Confiky(files='/etc/modernapify.ini')
 
 class LocalDatabase:
     TABLE_NAME = "api_sessions"
