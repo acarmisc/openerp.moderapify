@@ -1,15 +1,26 @@
 from klein import run, route, resource
-from helpers import Responder, RequestParser, LocalDatabase, Security, config, credential_cached
+from helpers import Responder, RequestParser, LocalDatabase, Security, credential_cached
 import json
 import uuid
 from twisted.logger import Logger
 from twisted.web.server import Session
 from erp_xmlrpc import OpenErp
+from confiky import Confiky
 
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("--settings")
+
+(options, args) = parser.parse_args()
+
+global config
+config = Confiky(files=options.settings)
 
 log = Logger()
 db = LocalDatabase(config.server.localdb)
-#db.init_db()
+# NOTE: uncomment below line to recreate DB each time instant starts
+# db.init_db()
 
 @route('/')
 def home(request):
@@ -25,7 +36,7 @@ def test_unauth(request):
 
 @route('/logout/')
 def logout(request):
-    token = Security(request=request).token
+    token = Security(config, request=request).token
     db.clear_session(token)
 
     request, response = Responder(request, message='Session closed.', payload=dict(token=token)).build()
@@ -40,9 +51,11 @@ def login(request):
 
     erp = OpenErp(config_object=config.server, user=username, password=password)
     if erp.uid:
-        token = Security().token
+        token = Security(config).token
         # User authorized
         db.save_credentials(token, username, password)
+
+        log.info("Login success from %s" % username)
         request, response = Responder(request, message='Welcome!', payload=dict(token=token)).build()
     else:
         request, response = Responder(request).unauthorize()
@@ -58,6 +71,21 @@ def model(request, model):
     fields = parser.parse_fields(request.args.get('fields'))
     erp = OpenErp(config_object=config.server, user=username, password=password)
     results = erp.find(model, query, fields=fields)
+
+    log.info("Query on model %s from %s" % (model, request.getClientIP()))
+
+    request, response = Responder(request, payload=results).build()
+
+    return response
+
+
+@route('/models/<model>/', methods=['POST'])
+@credential_cached
+def model_create(request, model):
+    parser = RequestParser()
+    payload = parser.parse_post(request.args)
+    erp = OpenErp(config_object=config.server, user=username, password=password)
+    results = erp.create(model, data=payload)
 
     request, response = Responder(request, payload=results).build()
 

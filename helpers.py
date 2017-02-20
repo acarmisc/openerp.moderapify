@@ -2,12 +2,9 @@ import json
 from twisted.web import http
 from twisted.enterprise import adbapi
 import sqlite3
-from confiky import Confiky
 import uuid
 from functools import wraps
 
-
-config = Confiky(files='/etc/modernapify.ini')
 
 class LocalDatabase:
     TABLE_NAME = "api_sessions"
@@ -53,7 +50,8 @@ class LocalDatabase:
 
 class Security:
 
-    def __init__(self, token=None, request=None):
+    def __init__(self, config, token=None, request=None):
+        self.db = LocalDatabase(config.server.localdb)
         self.token = token or uuid.uuid4().hex
 
         if request:
@@ -64,7 +62,6 @@ class Security:
         return "<Security %s>" % self.token
 
     def _extract_token(self):
-        
         headers = self.request.getAllHeaders()
         if 'authorization' in headers.keys():
             token = headers.get('authorization').split(' ')
@@ -80,24 +77,21 @@ class Security:
         return None
 
     def is_authenticated(self):
-        db = LocalDatabase(config.server.localdb)
-        credentials = db.get_credentials_by_token(self.token)
+        credentials = self.db.get_credentials_by_token(self.token)
         if credentials:
             return True
 
         return False
 
     def credentials(self):
-        db = LocalDatabase(config.server.localdb)
-        return db.get_credentials_by_token(self.token)
+        return self.db.get_credentials_by_token(self.token)
 
 def credential_cached(original_function):
     @wraps(original_function)
     def validate_user(*args, **kwargs):
+        config = original_function.__globals__.get('config')
         request = args[0]
-        security = Security(request=request)
-
-        print security
+        security = Security(config, request=request)
 
         if security.is_authenticated():
             credentials = security.credentials()
@@ -120,17 +114,14 @@ class RequestParser:
             return []
 
         query = query[0]
-        print query
         if ':' in query:
             queries = query.split(':')
         else:
             queries = [query]
-        print queries
 
         for q in queries:
             criteria.append(tuple(q.split(',')))
 
-        print criteria
         return criteria
 
     @staticmethod
@@ -140,6 +131,12 @@ class RequestParser:
 
         fields = fields[0]
         return fields.split(',')
+
+    @staticmethod
+    def parse_post(payload):
+        # TODO: format compliance should be checked
+        return payload
+
 
 class Responder:
 

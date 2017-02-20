@@ -40,8 +40,6 @@ class OpenErp:
         if not isinstance(args, list):
             raise ValueError('Find args must be a list of tuple.')
 
-        print args
-
         ids = self.sock.execute(self.dbname, self.uid, self.password, model, 'search', args)
         results = self.sock.execute(self.dbname, self.uid, self.password, model, 'read', ids, fields)
         return results

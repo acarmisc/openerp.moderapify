@@ -21,6 +21,7 @@ DAEMON=/opt/openerp.modernapify/venv/bin/twistd
 BASEDIR=/opt/openerp.modernapify/
 CLASS=main.resource
 LOGFILE=/var/log/$NAME.log
+CONFIGFILE=/etc/$NAME.ini
 SCRIPTNAME=/etc/init.d/$NAME
 SYSLOG=0
 
@@ -35,7 +36,7 @@ if [ $SYSLOG -eq 1 ]; then
     DAEMON_ARG_LOG="--syslog --prefix $NAME"
 fi
 
-DAEMON_ARGS="--pidfile=$PIDFILE $DAEMON_ARG_LOG web --class=$CLASS"
+DAEMON_ARGS="--pidfile=$PIDFILE $DAEMON_ARG_LOG web --settings=$CONFIGILE --class=$CLASS"
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
