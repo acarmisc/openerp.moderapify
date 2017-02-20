@@ -6,7 +6,7 @@ from twisted.logger import Logger
 from twisted.web.server import Session
 from erp_xmlrpc import OpenErp
 from confiky import Confiky
-
+import os
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -14,8 +14,16 @@ parser.add_option("--settings")
 
 (options, args) = parser.parse_args()
 
+try:
+    config_file = options.settings
+except Exception:
+    config_file = os.environ['MODERNAPIFYCONFIG']
+
+if not config_file:
+    raise ValueError('missing configuration settings.')
+
 global config
-config = Confiky(files=options.settings)
+config = Confiky(files=config_file)
 
 log = Logger()
 db = LocalDatabase(config.server.localdb)
