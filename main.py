@@ -9,15 +9,16 @@ from confiky import Confiky
 import os
 from optparse import OptionParser
 
-parser = OptionParser()
-parser.add_option("--settings")
-
-(options, args) = parser.parse_args()
 
 try:
-    config_file = options.settings
-except Exception:
     config_file = os.environ['MODERNAPIFYCONFIG']
+except KeyError:
+    parser = OptionParser()
+    parser.add_option("--settings")
+
+    (options, args) = parser.parse_args()
+
+    config_file = options.settings
 
 if not config_file:
     raise ValueError('missing configuration settings.')
