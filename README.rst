@@ -34,7 +34,7 @@ Usage
 
 Fire login call and get ``token`` in the response.
 
-    POST /api/login/
+    POST /login/
 
 With arguments:
 
@@ -53,17 +53,21 @@ Currently theese actions are supported:
 
 Pass ``model`` in dot notation (like ``res.partner``) and the id of item to be retrieved.
 
-    GET /api/<model>/<id>/
+    GET /models/<model>/<id>/
 
 **Query items**
 
-Call ``api/<model>`` passing ``query`` as semicolon separated list of criteria that Openerp love (ie: field, criteria, value).
+Call ``/models/<model>/`` passing ``query`` as semicolon separated list of criteria that Openerp love (ie: field, criteria, value).
 
-    GET /api/<model>/?query=name,like,foo:active,=,true&fields=id,name,bar
+    GET /models/<model>/?query=name,like,foo:active,=,true&fields=id,name,bar
 
 **Create item**
 
-Not yet implemented
+Call ``/models/<model>/`` passing fields in the POST payload.
+
+    POST /models/<model>/
+        name    =   'Foo'
+        counter =   132
 
 **Edit item**
 
