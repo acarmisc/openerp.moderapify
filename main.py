@@ -79,6 +79,7 @@ def model(request, model):
 @route('/models/<model>/', methods=['POST'])
 @credential_cached
 def model_create(request, model):
+    raise NotImplemented
     parser = RequestParser()
     payload = parser.parse_post(request.args)
     erp = OpenErp(config_object=config.server, user=username, password=password)
