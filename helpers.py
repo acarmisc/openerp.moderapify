@@ -133,8 +133,16 @@ class RequestParser:
         return fields.split(',')
 
     @staticmethod
-    def parse_post(payload):
-        # TODO: format compliance should be checked
+    def parse_args(data):
+        payload = dict(body=dict())
+        # query_params is a reserved keyword
+        if 'query_params' in data.keys():
+            payload['query_params'] = data.get('query_params')[0].split(',') if data.get('query_params') else list()
+            del data['query_params']
+
+        for k, v in data.iteritems():
+            payload['body'][k] = v if not isinstance(v, list) else v[0]
+
         return payload
 
 

@@ -1,6 +1,9 @@
 import xmlrpclib
 
 
+class OpenErpException(Exception):
+    pass
+
 class OpenErp:
 
     def __init__(self, config_object=None, host=None, dbname=None, user=None, password=None, token=None):
@@ -48,3 +51,13 @@ class OpenErp:
         results = self.sock.execute(self.dbname, self.uid, self.password, model, 'unlink', ids)
 
         return results
+
+    def execute(self, model, method_name, args, kwargs=None):
+        print kwargs
+        try:
+            data = self.sock.execute_kw(self.dbname, self.uid, self.password, model,
+                                        method_name, kwargs)
+        except xmlrpclib.Fault, e:
+            raise OpenErpException(e)
+
+        return data

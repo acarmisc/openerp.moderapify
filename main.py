@@ -81,9 +81,9 @@ def model(request, model):
 def model_create(request, model):
     raise NotImplemented
     parser = RequestParser()
-    payload = parser.parse_post(request.args)
+    payload = parser.parse_args(request.args)
     erp = OpenErp(config_object=config.server, user=username, password=password)
-    results = erp.create(model, data=payload)
+    results = erp.create(model, data=payload.get('body'))
 
     request, response = Responder(request, payload=results).build()
 
@@ -98,6 +98,19 @@ def model_get(request, model, id):
     erp = OpenErp(config_object=config.server, user=username, password=password)
     results = erp.find(model, args, fields=fields)
     log.debug('Received GET request for model %s with fields %s' % (model, fields))
+
+    request, response = Responder(request, payload=results).build()
+
+    return response
+
+
+@route('/actions/<model>/<action>/', methods=['POST'])
+@credential_cached
+def model_action(request, model, action):
+    parser = RequestParser()
+    payload = parser.parse_args(request.args)
+    erp = OpenErp(config_object=config.server, user=username, password=password)
+    results = erp.execute(model, action, args=[], kwargs=payload.get('body'))
 
     request, response = Responder(request, payload=results).build()
 

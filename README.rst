@@ -77,8 +77,23 @@ Call ``/models/<model>/`` passing fields in the POST payload.
 
 *Not yet implemented*
 
+**Call methods**
+
+Call ``/actions/<model>/<method_name>/`` using ``POST`` verb passing:
+    - positional arguments in query string or in post body using reserved ``query_params`` as reserved keyword
+    - keyword arguments in ``POST`` body
+
+    POST /actions/<model>/<method_name>/?query_params=lorem,ipsum
+
+    foo     = 'Foo'
+    bar     = 'Bar'
+
+*Warning:* strange behaviour, arguments in body not working.
+
 
 Production deploy
 -----------------
 
-To be done
+We provided easy ``start-stop-daemon`` script to be moved inside ``/etc/init.d/`` that act as usual:
+
+    $ /etc/init.d/modernapify start
