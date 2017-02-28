@@ -55,8 +55,8 @@ class OpenErp:
     def execute(self, model, method_name, args, kwargs=None):
         print kwargs
         try:
-            data = self.sock.execute_kw(self.dbname, self.uid, self.password, model,
-                                        method_name, kwargs)
+            data = self.sock.execute(self.dbname, self.uid, self.password, model,
+                                        method_name, args, kwargs)
         except xmlrpclib.Fault, e:
             raise OpenErpException(e)
 
