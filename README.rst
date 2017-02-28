@@ -88,7 +88,7 @@ Call ``/actions/<model>/<method_name>/`` using ``POST`` verb passing:
     foo     = 'Foo'
     bar     = 'Bar'
 
-*Warning:* strange behaviour, arguments in body not working.
+*Warning:* strange behaviour force me to use ``execute`` instead ``execute_kw`` that handle ``kwargs`` in a different way. More investigations needed! :) 
 
 
 Production deploy
