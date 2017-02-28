@@ -1,16 +1,17 @@
-from klein import run, route, resource
-from helpers import Responder, RequestParser, LocalDatabase, Security, credential_cached
 import json
 import uuid
 from twisted.logger import Logger
 from twisted.web.server import Session
+from klein import run, route, resource
+
+from helpers import Responder, RequestParser, LocalDatabase, Security, credential_cached
 from erp_xmlrpc import OpenErp
 from confiky import Confiky
 
 
 global config
 try:
-    config = Confiky(env_arg='MODERNAPIFYCONFIG', cli_arg='settings', files='settings.ini')
+    config = Confiky(env_arg='MODERNAPIFYCONFIG')
 except ValueError:
     raise ValueError('missing configuration settings.')
 
